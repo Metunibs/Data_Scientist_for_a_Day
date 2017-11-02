@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 '''
 Data Scientist for  Day - Codelab source code - classification.py
 
@@ -23,7 +25,7 @@ from sklearn.metrics import classification_report
 from sklearn.svm import SVC
 from sklearn import metrics
 from sklearn import preprocessing
-from sklearn.cross_validation import StratifiedShuffleSplit
+from sklearn.model_selection import StratifiedShuffleSplit			# CORRECT ! 
 import numpy as np
 
 
@@ -44,7 +46,6 @@ def misclassification_errors(classifier, X_tr, y_tr, X_cv, y_cv):
 	on the training set and on the cross validation set, as explained in the lab track.
 	Try to do it without for loops. That does not mean that you can use while loop instead.
     """
-
     raise Exception("Implement your own misclassification error measure!")
         
     return tr_err, cv_err
@@ -91,40 +92,39 @@ class ModelSelection(object):
         recall_by_C_and_gamma=np.zeros((len(self.C_list),len(self.gamma_list)), dtype=np.float)
         f1_by_C_and_gamma=np.zeros((len(self.C_list),len(self.gamma_list)), dtype=np.float)
         
-        set_ripartitions = StratifiedShuffleSplit(y, n_iterations = n_iterations, 
-                                                  test_size = test_size, indices=False)
-    
-        n_iter=len(set_ripartitions)
+        set_ripartitions = StratifiedShuffleSplit(n_splits=n_iterations, 
+                                                  test_size = test_size)			# CORRECT!
+                                                    
+        n_iter=set_ripartitions.get_n_splits(X, y)									# CORRECT!
         
-        for train,test in set_ripartitions:
+        for train,test in set_ripartitions.split(X, y):								# CORRECT!
             X_tr,X_cv,y_tr,y_cv =X[train],X[test],y[train],y[test]
             
             index_C=0
             for C in self.C_list:
-                
+
                 idx_gamma=0
                 for gamma in self.gamma_list:
-                
-		    """
-			TODO: Exercise 2
-			For each combination of C and gamma, compute the training error, cross-validation error, 
-			accuracy, precision, recall and f1 score obtained with the relative SVM rbf classifier,
-			obtained averaging the results obtained by the different dataset partitions re-arrangements.
-			The results will be stored relatively in the numpy arrays tr_err_by_C_and_gamma, 
-			cv_err_by_C_and_gamma, acc_by_C_and_gamma, prec_by_C_and_gamma, recall_by_C_and_gamma,
-			f1_score_by_C_and_gamma created previously. Columns contain the C index, while rows contain
-			the gamma index. While doing the exercise, you may find useful the SVC class in sklearn.svm 
-			module, the misclassification_errors that you implemented in the previous exercise and the
-			score functions that are implemented in sklearn metrics.
-		    """
+		    		"""
+					TODO: Exercise 2
+					For each combination of C and gamma, compute the training error, cross-validation error, 
+					accuracy, precision, recall and f1 score obtained with the relative SVM rbf classifier,
+					obtained averaging the results obtained by the different dataset partitions re-arrangements.
+					The results will be stored relatively in the numpy arrays tr_err_by_C_and_gamma, 
+					cv_err_by_C_and_gamma, acc_by_C_and_gamma, prec_by_C_and_gamma, recall_by_C_and_gamma,
+					f1_score_by_C_and_gamma created previously. Columns contain the C index, while rows contain
+					the gamma index. While doing the exercise, you may find useful the SVC class in sklearn.svm 
+					module, the misclassification_errors that you implemented in the previous exercise and the
+					score functions that are implemented in sklearn metrics.
+		 		    """
 
-		    raise Exception("Wake up! You are supposed to implement this part of code!")
+					raise Exception("Wake up! You are supposed to implement this part of code!")
 
-                    
                     idx_gamma=idx_gamma + 1
-                
+
                 index_C=index_C + 1
-                
+
+
         result=dict()
         result["C_list"]=self.C_list
         result["gamma_list"]=self.gamma_list
@@ -182,10 +182,11 @@ class LearningCurves(object):
         assert isinstance(gamma, (int, float))
         
         train_size=int( round( (1-test_size) * len(y) ))   
-        set_ripartitions = StratifiedShuffleSplit(y, n_iterations = n_iterations, 
-                                                  train_size=train_size, 
-                                                  indices=False)
-        n_iter=len(set_ripartitions)
+                                                  
+        set_ripartitions = StratifiedShuffleSplit(n_splits=n_iterations, 
+                                                  test_size = test_size)			# CORRECT!
+                                                    
+        n_iter=set_ripartitions.get_n_splits(X, y)									# CORRECT!
         
         n_samples=X.shape[0]
         n_features=X.shape[1]
@@ -195,7 +196,7 @@ class LearningCurves(object):
         tr_errors=np.zeros((len(m_list),1),dtype=np.float)
         cv_errors=np.zeros((len(m_list),1),dtype=np.float)
         
-        for train,test in set_ripartitions:
+        for train,test in set_ripartitions.split(X, y):								# CORRECT!
             X_tr,X_cv,y_tr,y_cv =X[train],X[test],y[train],y[test]
         
             idx=0
@@ -208,20 +209,22 @@ class LearningCurves(object):
                 reduced_y = y_tr[y_mask!=0]
 
 
-		"""
-			TODO: Exercise 3
-			Read the code of the current method "compute" and understand what is
-			happening. Once you have understood the code, try to understand the
-			meaning of the stratifiedShuffleMask method. What is that method suppose 
-			to do? What do reduced_X and reduced_y contain?
-			Then, compute for each m, the training error and the cross-validation error
-			averaged by the different re-arranged dataset ripartitions, and store them 
-			relatively in the tr_errors and cv_errors numpy vectors, order by the idx index.
-		"""
+				"""
+				TODO: Exercise 3
+				Read the code of the current method "compute" and understand what is
+				happening. Once you have understood the code, try to understand the
+				meaning of the stratifiedShuffleMask method. What is that method suppose 
+				to do? What do reduced_X and reduced_y contain?
+				Then, compute for each m, the training error and the cross-validation error
+				averaged by the different re-arranged dataset ripartitions, and store them 
+				relatively in the tr_errors and cv_errors numpy vectors, order by the idx index.
+				"""
             
                 raise Exception("One last effort! It is the last exercise.")
+            
                 
-		idx+=1
+                
+				idx+=1
                 
                 result=dict()
                 result["m_list"]=m_list
@@ -236,7 +239,7 @@ class SVM(object):
     
     def model_selection(self,X,y, C_list = None, gamma_list = None, test_size = 0.3, n_iterations = 20):
         
-        assert X!=None and y!=None     
+        assert X.any()!=None and y.any()!=None     			# CORRECT!
         assert len(X)==len(y)
             
         model_selection = ModelSelection(C_list=C_list,gamma_list=gamma_list)
